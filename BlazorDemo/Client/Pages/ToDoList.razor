@@ -1,0 +1,86 @@
+﻿@page "/todo"
+@inject ToDoItemsViewModel ViewModel
+@inject IJSRuntime JS
+@implements IDisposable
+
+<h1>To Do List</h1>
+
+<div @ref="_container">
+    @if (this.ViewModel.IsLoaded)
+    {
+        <h3>There are @ViewModel.ItemsLeft items left to complete </h3>
+
+        <ul>
+            @foreach (var item in this.ViewModel.OutstandingItems)
+            {
+                <li>
+                    <input @key="item " type="checkbox" checked="@item.IsCompleted"
+                           @onchange="@(async e => await this.ViewModel.CompleteItemAsync(item))" />
+                    @item.Description
+                </li>
+            }
+        </ul>
+
+        <br />
+
+        <EditForm OnValidSubmit="Submit" Model="this.ViewModel.NewItem">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <input type="text" @bind-value="this.ViewModel.NewItem.Description"
+                   @bind-value:event="oninput"
+                   placeholder="enter the new item.." />
+
+            <button type="submit" class="btn btn-primary"
+                    disabled="@(!this.ViewModel.CanAddNewItem)">
+                Add
+            </button>
+        </EditForm>
+    }
+    else
+    {
+        <p><em>Loading...</em></p>
+    }
+
+    <br />
+    <button type="button" class="btn btn-lg btn-info"
+            data-toggle="popover" title="Popover title"
+            data-content="And here's some amazing content. It's very engaging. Right?">
+        Click to toggle popover
+    </button>
+</div>
+
+@code {
+    protected override async Task OnParametersSetAsync()
+    {
+        await this.ViewModel.LoadAsync();
+    }
+
+    private bool _setFocus;
+    private async Task Submit()
+    {
+        await this.ViewModel.AddNewItemAsync();
+        _setFocus = true;
+    }
+
+    private ElementReference _container;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_setFocus)
+        {
+            _setFocus = false;
+            await this.JS.InvokeVoidAsync("utils.setFocus", _container, "form input[type=text]");
+        }
+
+        if (firstRender)
+        {
+            await this.JS.InvokeVoidAsync("utils.registerPopover", _container);
+        }
+    }
+
+    public void Dispose()
+    {
+        this.JS.InvokeVoidAsync("utils.unregisterPopover", _container);
+    }
+}

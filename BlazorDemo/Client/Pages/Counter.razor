@@ -1,0 +1,9 @@
+﻿@page "/counter"
+@inject CounterViewModel ViewModel
+@inherits ReactiveComponentBase
+
+<h1>Counter</h1>
+
+<p>@this.ViewModel.Title</p>
+
+<button class="btn btn-primary" @onclick="this.ViewModel.Increment">Click me</button>
