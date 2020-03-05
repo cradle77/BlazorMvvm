@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BlazorDemo.Components
 {
-    internal class LoaderService : ILoaderService, INotifyPropertyChanged
+    internal class LoaderService : ILoaderService
     {
         private bool _show;
         public bool Show

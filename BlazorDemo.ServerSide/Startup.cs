@@ -32,6 +32,7 @@ namespace BlazorDemo.ServerSide
             services.AddScoped<CounterViewModel>();
             services.AddDbContext<DemoContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DemoContext")));
+
             services.AddTransient<IToDoService, EntityFrameworkToDoService>();
             services.AddTransient<ToDoItemsViewModel>();
             services.AddLoader();
